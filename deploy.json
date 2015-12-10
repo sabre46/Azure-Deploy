@@ -1,143 +1,143 @@
 { 
-2   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#", 
-3   "contentVersion": "1.0.0.0", 
-4   "parameters": { 
-5     "location": { 
-6       "type": "string", 
-7       "metadata": { 
-8         "description": "Location to create the VM in" 
-9       } 
-10     }, 
-11     "osDiskVhdUri": { 
-12       "type": "string", 
-13       "metadata": { 
-14         "description": "Uri of the existing VHD" 
-15       } 
-16     }, 
-17     "osType": { 
-18       "type": "string", 
-19       "allowedValues": [ 
-20         "Windows", 
-21         "Linux" 
-22       ], 
-23       "metadata": { 
-24         "description": "Type of OS on the existing vhd" 
-25       } 
-26     }, 
-27     "vmSize": { 
-28       "type": "string", 
-29       "defaultValue": "Standard_A2", 
-30       "metadata": { 
-31         "description": "Size of the VM" 
-32       } 
-33     }, 
-34     "vmName": { 
-35       "type": "string", 
-36       "metadata": { 
-37         "description": "Name of the VM" 
-38       } 
-39     } 
-40   }, 
-41   "variables": { 
-42     "api-version": "2015-06-15", 
-43     "addressPrefix": "10.0.0.0/16", 
-44     "subnetName": "Subnet", 
-45     "subnetPrefix": "10.0.0.0/24", 
-46     "publicIPAddressName": "specializedVMPublicIP", 
-47     "publicIPAddressType": "Static", 
-48     "virtualNetworkName": "specializedVMVNET", 
-49     "vnetID": "[resourceId('Microsoft.Network/virtualNetworks',variables('virtualNetworkName'))]", 
-50     "subnetRef": "[concat(variables('vnetID'),'/subnets/',variables('subnetName'))]", 
-51     "nicName": "specializedVMNic" 
-52   }, 
-53   "resources": [ 
-54     { 
-55       "apiVersion": "[variables('api-version')]", 
-56       "type": "Microsoft.Network/virtualNetworks", 
-57       "name": "[variables('virtualNetworkName')]", 
-58       "location": "[parameters('location')]", 
-59       "properties": { 
-60         "addressSpace": { 
-61           "addressPrefixes": [ 
-62             "[variables('addressPrefix')]" 
-63           ] 
-64         }, 
-65         "subnets": [ 
-66           { 
-67             "name": "[variables('subnetName')]", 
-68             "properties": { 
-69               "addressPrefix": "[variables('subnetPrefix')]" 
-70             } 
-71           } 
-72         ] 
-73       } 
-74     }, 
-75     { 
-76       "apiVersion": "[variables('api-version')]", 
-77       "type": "Microsoft.Network/networkInterfaces", 
-78       "name": "[variables('nicName')]", 
-79       "location": "[parameters('location')]", 
-80       "dependsOn": [ 
-81         "[concat('Microsoft.Network/publicIPAddresses/', variables('publicIPAddressName'))]", 
-82         "[concat('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]" 
-83       ], 
-84       "properties": { 
-85         "ipConfigurations": [ 
-86           { 
-87             "name": "ipconfig1", 
-88             "properties": { 
-89               "privateIPAllocationMethod": "Dynamic", 
-90               "publicIPAddress": { 
-91                 "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))]" 
-92               }, 
-93               "subnet": { 
-94                 "id": "[variables('subnetRef')]" 
-95               } 
-96             } 
-97           } 
-98         ] 
-99       } 
-100     }, 
-101     { 
-102       "apiVersion": "[variables('api-version')]", 
-103       "type": "Microsoft.Network/publicIPAddresses", 
-104       "name": "[variables('publicIPAddressName')]", 
-105       "location": "[parameters('location')]", 
-106       "properties": { 
-107         "publicIPAllocationMethod": "[variables('publicIPAddressType')]" 
-108       } 
-109     }, 
-110     { 
-111       "apiVersion": "[variables('api-version')]", 
-112       "type": "Microsoft.Compute/virtualMachines", 
-113       "name": "[parameters('vmName')]", 
-114       "location": "[parameters('location')]", 
-115       "dependsOn": [ 
-116         "[concat('Microsoft.Network/networkInterfaces/', variables('nicName'))]" 
-117       ], 
-118       "properties": { 
-119         "hardwareProfile": { 
-120           "vmSize": "[parameters('vmSize')]" 
-121         }, 
-122         "storageProfile": { 
-123           "osDisk": { 
-124             "name": "[concat(parameters('vmName'),'-osDisk')]", 
-125             "osType": "[parameters('osType')]", 
-126             "caching": "ReadWrite", 
-127             "vhd": { 
-128               "uri": "[parameters('osDiskVhdUri')]" 
-129             }, 
-130             "createOption": "Attach" 
-131           } 
-132         }, 
-133         "networkProfile": { 
-134           "networkInterfaces": [ 
-135             { 
-136               "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('nicName'))]" 
-137             } 
-138           ] 
-139         } 
-140       } 
-141     } 
-142   ] 
-143 } 
+   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#", 
+   "contentVersion": "1.0.0.0", 
+   "parameters": { 
+     "location": { 
+       "type": "string", 
+       "metadata": { 
+         "description": "Location to create the VM in" 
+       } 
+     }, 
+     "osDiskVhdUri": { 
+       "type": "string", 
+       "metadata": { 
+         "description": "Uri of the existing VHD" 
+       } 
+     }, 
+     "osType": { 
+       "type": "string", 
+       "allowedValues": [ 
+         "Windows", 
+         "Linux" 
+       ], 
+       "metadata": { 
+         "description": "Type of OS on the existing vhd" 
+       } 
+     }, 
+     "vmSize": { 
+       "type": "string", 
+       "defaultValue": "Standard_A2", 
+       "metadata": { 
+         "description": "Size of the VM" 
+       } 
+     }, 
+     "vmName": { 
+       "type": "string", 
+       "metadata": { 
+         "description": "Name of the VM" 
+       } 
+     } 
+   }, 
+   "variables": { 
+     "api-version": "2015-06-15", 
+     "addressPrefix": "10.0.0.0/16", 
+     "subnetName": "Subnet", 
+     "subnetPrefix": "10.0.0.0/24", 
+     "publicIPAddressName": "specializedVMPublicIP", 
+     "publicIPAddressType": "Static", 
+     "virtualNetworkName": "specializedVMVNET", 
+     "vnetID": "[resourceId('Microsoft.Network/virtualNetworks',variables('virtualNetworkName'))]", 
+     "subnetRef": "[concat(variables('vnetID'),'/subnets/',variables('subnetName'))]", 
+     "nicName": "specializedVMNic" 
+   }, 
+  "resources": [ 
+     { 
+       "apiVersion": "[variables('api-version')]", 
+       "type": "Microsoft.Network/virtualNetworks", 
+       "name": "[variables('virtualNetworkName')]", 
+       "location": "[parameters('location')]", 
+       "properties": { 
+         "addressSpace": { 
+           "addressPrefixes": [ 
+             "[variables('addressPrefix')]" 
+           ] 
+         }, 
+         "subnets": [ 
+           { 
+             "name": "[variables('subnetName')]", 
+             "properties": { 
+               "addressPrefix": "[variables('subnetPrefix')]" 
+             } 
+           } 
+         ] 
+       } 
+     }, 
+     { 
+       "apiVersion": "[variables('api-version')]", 
+       "type": "Microsoft.Network/networkInterfaces", 
+       "name": "[variables('nicName')]", 
+       "location": "[parameters('location')]", 
+       "dependsOn": [ 
+         "[concat('Microsoft.Network/publicIPAddresses/', variables('publicIPAddressName'))]", 
+         "[concat('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]" 
+       ], 
+       "properties": { 
+         "ipConfigurations": [ 
+           { 
+             "name": "ipconfig1", 
+            "properties": { 
+               "privateIPAllocationMethod": "Dynamic", 
+               "publicIPAddress": { 
+                 "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))]" 
+               }, 
+               "subnet": { 
+                 "id": "[variables('subnetRef')]" 
+               } 
+             } 
+           } 
+         ] 
+       } 
+     }, 
+     { 
+       "apiVersion": "[variables('api-version')]", 
+       "type": "Microsoft.Network/publicIPAddresses", 
+       "name": "[variables('publicIPAddressName')]", 
+      "location": "[parameters('location')]", 
+       "properties": { 
+         "publicIPAllocationMethod": "[variables('publicIPAddressType')]" 
+       } 
+     }, 
+     { 
+       "apiVersion": "[variables('api-version')]", 
+       "type": "Microsoft.Compute/virtualMachines", 
+       "name": "[parameters('vmName')]", 
+       "location": "[parameters('location')]", 
+       "dependsOn": [ 
+         "[concat('Microsoft.Network/networkInterfaces/', variables('nicName'))]" 
+       ], 
+      "properties": { 
+         "hardwareProfile": { 
+           "vmSize": "[parameters('vmSize')]" 
+         }, 
+         "storageProfile": { 
+           "osDisk": { 
+             "name": "[concat(parameters('vmName'),'-osDisk')]", 
+             "osType": "[parameters('osType')]", 
+             "caching": "ReadWrite", 
+             "vhd": { 
+               "uri": "[parameters('osDiskVhdUri')]" 
+             }, 
+             "createOption": "Attach" 
+           } 
+         }, 
+         "networkProfile": { 
+           "networkInterfaces": [ 
+             { 
+               "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('nicName'))]" 
+             } 
+           ] 
+         } 
+       } 
+     } 
+   ] 
+ } 
